@@ -13,5 +13,5 @@ module.exports = app => {
 
     router.post("/forgetPassword", controller.ForgetPassword);
   
-    app.use('/fb', router);
+    app.use('/', router);
   };
