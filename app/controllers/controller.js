@@ -13,6 +13,12 @@ const {
 } = require('firebase/auth')
 
 
+exports.Test= (req, res) => {
+  // Validate request
+    res.status(200).send({
+      message: "ok"
+    });
+};
 
 
 exports.Login= (req, res) => {

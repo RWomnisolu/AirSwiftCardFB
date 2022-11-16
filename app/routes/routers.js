@@ -3,6 +3,7 @@ module.exports = app => {
   
     var router = require("express").Router();
   
+    router.get("/test", controller.Test);
 
     router.post("/login", controller.Login);
 
@@ -12,5 +13,5 @@ module.exports = app => {
 
     router.post("/forgetPassword", controller.ForgetPassword);
   
-    app.use('/api/fb', router);
+    app.use('/fb', router);
   };
