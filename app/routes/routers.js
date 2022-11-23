@@ -13,7 +13,7 @@ module.exports = app => {
 
     router.post("/signup", controller.SignUp);
 
-    router.post("/forgetPassword", controller.ForgetPassword);
+    router.post("/forgetPassword", controller.SendResetEmail);
   
     app.use('/', router);
   };
