@@ -7,9 +7,11 @@ module.exports = app => {
 
     router.post("/login", controller.Login);
 
+    router.post("/refresh", controller.RenewToken);
+
     router.post("/bplogin", controller.LoginBP);
 
-    router.post("/login", controller.SignUp);
+    router.post("/signup", controller.SignUp);
 
     router.post("/forgetPassword", controller.ForgetPassword);
   
