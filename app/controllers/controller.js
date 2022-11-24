@@ -394,85 +394,97 @@ exports.SendResetEmail= (req, res) =>  {
 
   const data=req.body
 
-  if (data.Email==undefined) {
+  if (data.Email==undefined || data.Type==undefined) {
     res.status(400).send({
       message: "invaild body"
     });
     return;
   }
+  var url
+  if(data.Type=="reset"){
+    url="http://localhost:8080/resetemail/"
+  }else if(data.Type=="verify"){
+    url="http://localhost:8080/verifyemail/"
+  }else{
+    res.status(400).send({
+      message: "invaild body"
+    });
+    return;
+  }
+
   console.log(data.Email)
   const Email=data.Email
   const auth=getAuth(app1)
 
   fetchSignInMethodsForEmail(auth, data.Email)
   .then((providers) => {
-      if(providers.length==0){
+      if(providers.length>0){
+        console.log(url)
+        fetch( url+data.Email, {
+          method: 'GET',
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            //Authorization: `Bearer ` + token,
+          },})
+          .then((response)=>response.json())
+          .then((data)=>{
+            console.log(data)
+            if(data==undefined){
+              {
+                res.status(400).send({
+                  message: "generating link error",
+                  data: data
+                });
+                return;
+              }
+            }
+            else if (data.code==1000){
+              const link=data.data
+              sendEmail(link, Email)
+              .then(()=>{
+                res.status(200).send({
+                message: "email sent",
+                });
+                return;
+              })
+              .catch((error)=>{
+                res.status(400).send({
+                  message: "email sent error",
+                  data:"error"
+                  });
+                  return;
+              })
+            }else{
+              res.status(400).send({
+                message: "generating link error",
+                data: data
+              });
+              return;
+            }
+          })
+          .catch ((error)=>{
+            console.log(error);
+            res.status(400).send({
+              message: "generating link error",
+            });
+          })
+      }else{
         res.status(400).send({
           message: "Email check fail",
-          data:"email unregister"
         });
-        return
+        return;
       }
   })
   .catch ((error)=>{
-    console.log(error)
+    console.log("1",error)
     res.status(400).send({
       message: "Email check fail",
       data:error
     });
-    return
+    return;
   })
 
-
-  fetch('http://localhost:8080/resetemail/'+data.Email, {
-    method: 'GET',
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      //Authorization: `Bearer ` + token,
-    },})
-
-    .then((response)=>response.json())
-    .then((data)=>{
-      console.log(data)
-      if(data==undefined){
-        {
-          res.status(400).send({
-            message: "generating link error",
-            data: data
-          });
-        }
-      }
-      else if (data.code==1000){
-        const link=data.data
-        sendEmail(link, Email)
-        .then(()=>{
-          res.status(200).send({
-          message: "email sent",
-          });
-          return;
-        })
-        .catch((error)=>{
-          res.status(400).send({
-            message: "email sent error",
-            data:"error"
-            });
-            return;
-        })
-      }else{
-        res.status(400).send({
-          message: "generating link error",
-          data: data
-        });
-        return;
-      }
-    })
-    .catch ((error)=>{
-      console.log(error);
-      res.status(400).send({
-        message: "generating link error",
-      });
-    })
 };
 function sendEmail(actionLink, to){
 
